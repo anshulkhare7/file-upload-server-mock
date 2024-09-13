@@ -9,6 +9,6 @@ const payload = {
 };
 
 // Generate the token
-const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "24h" });
 
 console.log("Generated Token:", token);
