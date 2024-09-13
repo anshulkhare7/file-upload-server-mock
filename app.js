@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
+const jwt = require("jsonwebtoken");
 
 // Set the folder to save uploaded files (can be easily changed)
 const UPLOAD_FOLDER = "/Users/anshul/tmp/uploads/";
@@ -10,6 +11,9 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 // Supported file types
 const ALLOWED_FILE_TYPES = [".txt", ".pdf", ".jpg", ".mp4"];
+
+// Secret key to sign the JWT token
+const JWT_SECRET = "honeycomb"; // Change this to a more secure secret
 
 // Initialize Express app
 const app = express();
@@ -42,8 +46,27 @@ const upload = multer({
   fileFilter: fileFilter,
 }).single("file");
 
-// POST endpoint to upload a file
-app.post("/upload", (req, res) => {
+// Middleware for verifying JWT token
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "No token provided" });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: "Invalid token" });
+    }
+
+    req.user = user;
+    next();
+  });
+}
+
+// POST endpoint to upload a file (requires authentication)
+app.post("/upload", authenticateToken, (req, res) => {
   upload(req, res, (err) => {
     if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
       return res
