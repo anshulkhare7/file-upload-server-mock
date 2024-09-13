@@ -3,7 +3,7 @@ const multer = require("multer");
 const path = require("path");
 
 // Set the folder to save uploaded files (can be easily changed)
-const UPLOAD_FOLDER = "./uploads/";
+const UPLOAD_FOLDER = "/Users/anshul/tmp/uploads/";
 
 // Define the maximum file size (5 MB)
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -20,7 +20,8 @@ const storage = multer.diskStorage({
     cb(null, UPLOAD_FOLDER);
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+    // Save the file with the original name
+    cb(null, file.originalname);
   },
 });
 
@@ -60,7 +61,7 @@ app.post("/upload", (req, res) => {
 
     res.json({
       message: "File uploaded successfully!",
-      fileName: req.file.filename,
+      fileName: req.file.originalname,
     });
   });
 });
