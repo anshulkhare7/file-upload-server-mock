@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
     cb(null, UPLOAD_FOLDER);
   },
   filename: (req, file, cb) => {
-    // Save the file with the original name
+    console.log(`Receiving file: ${file.originalname}`); // Log the file name when the request is received
     cb(null, file.originalname);
   },
 });
@@ -81,6 +81,10 @@ app.post("/upload", authenticateToken, (req, res) => {
         .status(400)
         .json({ message: "No file uploaded or invalid file type." });
     }
+
+    // Log when the file is saved
+    const filePath = path.join(UPLOAD_FOLDER, req.file.originalname);
+    console.log(`File saved successfully at: ${filePath}`);
 
     res.json({
       message: "File uploaded successfully!",
