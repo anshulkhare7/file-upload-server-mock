@@ -14,7 +14,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_FILE_TYPES = [".txt", ".pdf", ".jpg", ".mp4"];
 
 // Allowed status values for file status updates
-const ALLOWED_STATUSES = ["Failed", "Success", "Processing"];
+const ALLOWED_STATUSES = ["Download_Failed", "Upload_Failed"];
 
 // Secret key to sign the JWT token
 const JWT_SECRET = "honeycomb"; // Change this to a more secure secret
