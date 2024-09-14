@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const jwt = require("jsonwebtoken");
+const bodyParser = require("body-parser");
 
 // Set the folder to save uploaded files (can be easily changed)
 const UPLOAD_FOLDER = "/Users/anshul/tmp/uploads/";
@@ -12,11 +13,16 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 // Supported file types
 const ALLOWED_FILE_TYPES = [".txt", ".pdf", ".jpg", ".mp4"];
 
+// Allowed status values for file status updates
+const ALLOWED_STATUSES = ["Failed", "Success", "Processing"];
+
 // Secret key to sign the JWT token
 const JWT_SECRET = "honeycomb"; // Change this to a more secure secret
 
 // Initialize Express app
 const app = express();
+
+app.use(bodyParser.json());
 
 // Set up multer for file upload
 const storage = multer.diskStorage({
@@ -91,6 +97,31 @@ app.post("/upload", authenticateToken, (req, res) => {
       fileName: req.file.originalname,
     });
   });
+});
+
+// POST endpoint to update the status of a file (requires authentication)
+app.post("/update", authenticateToken, (req, res) => {
+  const { id, status } = req.body;
+
+  // Check if both `id` and `status` are provided
+  if (!id || !status) {
+    return res.status(400).json({ message: "id and status are required" });
+  }
+
+  // Validate the status
+  if (!ALLOWED_STATUSES.includes(status)) {
+    return res.status(400).json({
+      message: `Invalid status. Allowed values are: ${ALLOWED_STATUSES.join(
+        ", "
+      )}`,
+    });
+  }
+
+  // Log the update (in a real application, you would update a database here)
+  console.log(`Updating file with ID: ${id} to status: ${status}`);
+
+  // Respond with a 200 OK status
+  res.status(200).send("OK");
 });
 
 // Start the server
